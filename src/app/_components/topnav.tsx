@@ -52,8 +52,8 @@ const components: { title: string; href: string; description: string }[] = [
 
 export default function NavigationMenuDemo() {
   return (
-    <NavigationMenu>
-      <NavigationMenuList>
+    <NavigationMenu className="grid  min-w-full grid-cols-[1fr_auto_1fr] px-4">
+      <NavigationMenuList className="flex justify-start">
         <NavigationMenuItem>
           <NavigationMenuTrigger>Getting started</NavigationMenuTrigger>
           <NavigationMenuContent>
@@ -112,6 +112,12 @@ export default function NavigationMenuDemo() {
           </Link>
         </NavigationMenuItem>
       </NavigationMenuList>
+      <div className="max-h-16">
+        <img src="./assets/zalando_logo.webp" alt="logo" className="max-h-16" />
+      </div>
+      <div className="flex justify-end">
+        <Input className="w-64 " placeholder="Search..." />
+      </div>
     </NavigationMenu>
   );
 }
