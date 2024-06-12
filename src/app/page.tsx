@@ -13,9 +13,7 @@ export default async function Home() {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center ">
       <div className="flex flex-col items-center gap-2">
-        <H3 className="text-2xl ">
-          {hello ? hello.greeting : "Loading tRPC query..."}
-        </H3>
+        <H3>{hello ? hello.greeting : "Loading tRPC query..."}</H3>
 
         <div className="flex flex-col items-center justify-center gap-4">
           {session && <P>Logged in as {session.user?.name}</P>}
