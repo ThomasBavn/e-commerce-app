@@ -7,18 +7,17 @@ import {
 } from "~/server/api/trpc";
 
 export const productRouter = createTRPCRouter({
-    get: publicProcedure
-        .input(z.object({ id: z.number().optional() }))
-        .query(async ({ ctx, input }) => {
-            if (input.id) {
-                return ctx.db.product.findFirst({
-                    where: {
-                        id: input.id,
-                    },
-                });
-            }
-            return ctx.db.product.findMany();
-        }),
+    getById: publicProcedure.input(z.number()).query(async ({ ctx, input }) => {
+        return ctx.db.product.findFirst({
+            where: {
+                id: input,
+            },
+        });
+    }),
+
+    getAll: publicProcedure.query(async ({ ctx }) => {
+        return ctx.db.product.findMany();
+    }),
 
     create: protectedProcedure
         .input(
