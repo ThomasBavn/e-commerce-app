@@ -3,9 +3,8 @@
 ## TODO
 
 - [ ] Create database schema
-- [x] Make CRUD operations for product
+- [x] CRUD operations for Product
 - [ ] Create 'create product' page
-- [ ] Create endpoint to display products
 
 This is a [T3 Stack](https://create.t3.gg/) project bootstrapped with `create-t3-app`.
 
