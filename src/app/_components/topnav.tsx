@@ -1,7 +1,6 @@
 import * as React from "react";
 import Link from "next/link";
 
-import { Icons } from "@components/ui/icons";
 import {
   NavigationMenu,
   NavigationMenuContent,
@@ -11,6 +10,9 @@ import {
   NavigationMenuTrigger,
 } from "@components/ui/navigation-menu";
 import { cn } from "~/lib/utils";
+import { Input } from "./ui/input";
+import { AppleIcon } from "lucide-react";
+import { Button } from "./ui/button";
 
 const components: { title: string; href: string; description: string }[] = [
   {
@@ -113,7 +115,13 @@ export default function NavigationMenuDemo() {
         </NavigationMenuItem>
       </NavigationMenuList>
       <div className="max-h-16">
-        <img src="./assets/zalando_logo.webp" alt="logo" className="max-h-16" />
+        <Link href="/" passHref>
+          <img
+            src="./assets/zalando_logo.webp"
+            alt="logo"
+            className="max-h-16"
+          />
+        </Link>
       </div>
       <div className="flex justify-end">
         <Input className="w-64 " placeholder="Search..." />
