@@ -5,13 +5,16 @@ import { getServerAuthSession } from "~/server/auth";
 import { api } from "~/trpc/server";
 import { H3, P } from "./_components/ui/typography";
 import { Button } from "./_components/ui/button";
+import ProductCard from "@components/productCard";
 
 export default async function Home() {
   const hello = await api.post.hello({ text: "from tRPC" });
   const session = await getServerAuthSession();
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center ">
+    <main className="flex min-h-screen flex-col items-center justify-center">
+      <ProductCard />
+
       <div className="flex flex-col items-center gap-2">
         <H3>{hello ? hello.greeting : "Loading tRPC query..."}</H3>
 
@@ -35,6 +38,8 @@ async function CrudShowcase() {
   if (!session?.user) return null;
 
   const latestPost = await api.post.getLatest();
+
+  const x = await api.product.getById(1);
 
   return (
     <div className="w-full max-w-xs">
