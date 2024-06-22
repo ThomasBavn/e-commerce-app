@@ -68,10 +68,7 @@ export const productRouter = createTRPCRouter({
                     where: {
                         id: input.id,
                     },
-                    data: {
-                        name: input.newProduct.name,
-                        price: input.newProduct.price,
-                    },
+                    data: input,
                 });
             }
             return ctx.db.product.create({

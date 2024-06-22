@@ -4,8 +4,8 @@
 
 -   [x] Create database schema
 -   [x] CRUD operations for Product
--   [ ] Connect to uploadthing
--   [ ] Create 'create product' page
+-   [x] Connect to uploadthing
+-   [x] Create 'create product' page
 
 ## Ideas
 

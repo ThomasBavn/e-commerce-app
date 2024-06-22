@@ -66,10 +66,10 @@ model VerificationToken {
 }
 
 model Product {
-  id    Int      @id @default(autoincrement())
-  name  String
-  price Float
-  image String[]
+  id        Int      @id @default(autoincrement())
+  name      String
+  price     Float
+  imageUrls String[]
 
   @@index([name])
 }
