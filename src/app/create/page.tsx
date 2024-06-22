@@ -1,6 +1,5 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { useDropzone } from "react-dropzone";
 import {
     Form,
     FormControl,
@@ -14,8 +13,13 @@ import { Input } from "@components/ui/input";
 import { useForm } from "react-hook-form";
 import { z } from "zod";
 import { Button } from "@components/ui/button";
+import React from "react";
+import { useDropzone } from "react-dropzone";
+import { api } from "~/trpc/server";
 import { ourFileRouter } from "../api/uploadthing/core";
-import { UploadDropzone } from "~/lib/utils/uploadthing";
+import { createRouteHandler } from "uploadthing/server";
+import { POST } from "../api/uploadthing/route";
+import { NextRequest } from "next/server";
 
 const formSchema = z.object({
     name: z
@@ -37,96 +41,105 @@ const CreatePage = () => {
         },
     });
 
-    const onSubmit = (value: z.infer<typeof formSchema>) => {
+    const [previewImage, setPreviewImage] = React.useState<string[]>([]);
+
+    const onSubmit = async (value: z.infer<typeof formSchema>) => {
         console.log("submit", value);
 
-        if (value.images.length > 0) return;
     };
 
     const { getRootProps, getInputProps } = useDropzone({
+        multiple: true,
         accept: {
             "image/jpeg": [],
             "image/png": [],
             "image/webp": [],
         },
-        onDropAccepted: (files: File[]) => {
-            form.setValue("images", files);
-        },
-        onDropRejected: err => {
-            console.error("new error", err);
-            if (!err[0]) return;
 
-            switch (err?.[0].errors[0]?.code) {
-                case "file-invalid-type":
-                    form.setError("images", {
-                        message:
-                            "One or more files have an invalid file format",
-                    });
-                    break;
-            }
+        onDrop: (acceptedFiles: File[]) => {
+            console.log("files", acceptedFiles);
+            setPreviewImage(
+                acceptedFiles.map(file => URL.createObjectURL(file)),
+            );
+
+            form.setValue("images", acceptedFiles);
         },
     });
 
     return (
-        <div className="grid place-items-center">
-            <div className="h-60 w-40 ">
-                <Form {...form}>
-                    <form
-                        onSubmit={form.handleSubmit(onSubmit, e =>
-                            console.log("error", e),
+        <div className="grid place-items-center ">
+            <Form {...form}>
+                <form
+                    onSubmit={form.handleSubmit(onSubmit, e =>
+                        console.log("error", e),
+                    )}
+                    className="space-y-4"
+                >
+                    <FormField
+                        control={form.control}
+                        name="name"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Name</FormLabel>
+                                <FormControl>
+                                    <Input {...field} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
                         )}
-                    >
-                        <FormField
-                            control={form.control}
-                            name="name"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel>Name</FormLabel>
-                                    <FormControl>
-                                        <Input {...field} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="price"
-                            render={({ field: { value, ...rest } }) => (
-                                <FormItem>
-                                    <FormLabel>Price</FormLabel>
-                                    <FormControl>
-                                        <Input value={value ?? ""} {...rest} />
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <FormField
-                            control={form.control}
-                            name="images"
-                            render={({ field }) => (
-                                <FormItem>
-                                    <FormLabel></FormLabel>
-                                    <FormControl>
-                                        <div {...getRootProps()}>
-                                            <input
-                                                onChange={field.onChange}
-                                                {...getInputProps()}
-                                            />
-                                            <div className="grid h-32 w-40 place-items-center bg-neutral-400">
-                                                Upload file
-                                            </div>
+                    />
+                    <FormField
+                        control={form.control}
+                        name="price"
+                        render={({ field: { value, ...rest } }) => (
+                            <FormItem>
+                                <FormLabel>Price</FormLabel>
+                                <FormControl>
+                                    <Input value={value ?? ""} {...rest} />
+                                </FormControl>
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <FormField
+                        control={form.control}
+                        name="images"
+                        render={({ field }) => (
+                            <FormItem>
+                                <FormLabel>Upload thumbnails</FormLabel>
+                                <FormControl>
+                                    <div {...getRootProps()}>
+                                        <Input
+                                            onChange={field.onChange}
+                                            {...getInputProps()}
+                                        />
+                                        <div className="grid h-32 w-40 place-items-center bg-neutral-400">
+                                            Upload file
                                         </div>
-                                    </FormControl>
-                                    <FormMessage />
-                                </FormItem>
-                            )}
-                        />
-                        <Button type="submit">Submit</Button>
-                    </form>
-                </Form>
-            </div>
+                                    </div>
+                                </FormControl>
+                                {previewImage.length > 0 && (
+                                    <FormDescription className="flex gap-4 h-40">
+                                        {previewImage.map(imageUrl => (
+                                            <img
+                                                key={imageUrl}
+                                                src={imageUrl}
+                                                onLoad={() =>
+                                                    URL.revokeObjectURL(
+                                                        imageUrl,
+                                                    )
+                                                }
+                                            />
+                                        ))}
+                                    </FormDescription>
+                                )}
+                                <FormMessage />
+                            </FormItem>
+                        )}
+                    />
+                    <Button type="submit">Submit</Button>
+                </form>
+            </Form>
         </div>
     );
 };
