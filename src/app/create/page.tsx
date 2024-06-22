@@ -1,5 +1,6 @@
 "use client";
 import { zodResolver } from "@hookform/resolvers/zod";
+import Image from "next/image";
 import {
     Form,
     FormControl,
@@ -15,15 +16,17 @@ import { z } from "zod";
 import { Button } from "@components/ui/button";
 import React from "react";
 import { useDropzone } from "react-dropzone";
-import { generateReactHelpers } from "@uploadthing/react";
 import { uploadFiles } from "~/lib/utils/uploadthing";
 import { type NewProduct } from "~/server/api/routers/product";
+import { api } from "~/trpc/server";
+import { UploadThingError } from "uploadthing/server";
+import { PrismaClientValidationError } from "@prisma/client/runtime/library";
+import { AspectRatio } from "@components/ui/aspect-ratio";
 
 const formSchema = z.object({
-    name: z
-        .string()
-        .min(1, { message: "Product name too short" })
-        .max(255, { message: "Product name too short" }),
+    name: z.string(),
+    // .min(1, { message: "Product name too short" })
+    // .max(255, { message: "Product name too short" }),
     price: z.coerce
         .number({ invalid_type_error: "Price must be a number" })
         .min(0)
@@ -39,20 +42,40 @@ const CreatePage = () => {
         },
     });
 
+    console.log("errors", form.formState.errors);
+
     const [previewImage, setPreviewImage] = React.useState<string[]>([]);
 
     const onSubmit = async (value: z.infer<typeof formSchema>) => {
         console.log("submit", value);
 
-        const uploadResult = await uploadFiles("thumbnailUploader", {
-            files: value.images,
-        });
+        try {
+            const fileUploadResult = await uploadFiles("thumbnailUploader", {
+                files: value.images,
+            });
+            console.log("uploaded files", fileUploadResult);
 
-        const productToUpload: NewProduct = {
-            name: value.name,
-            price: value.price,
-            image: uploadResult.map(file => file.url),
-        };
+            const productToUpload: NewProduct = {
+                name: value.name,
+                price: value.price,
+                imageUrls: fileUploadResult.map(file => file.url),
+            };
+
+            const productCreateResult =
+                await api.product.create(productToUpload);
+
+            console.log("everything was succesful", productCreateResult);
+        } catch (e) {
+            console.log("Error caught", e);
+            if (e instanceof UploadThingError) {
+                console.log("Error", e.message, e.code, e.data);
+                if (e.message.includes("FileSizeMismatch"))
+                    form.setError("images", e);
+            } else if (e instanceof Error) {
+                console.log("unknown error", e);
+                form.setError("root", e);
+            }
+        }
     };
 
     const { getRootProps, getInputProps } = useDropzone({
@@ -62,7 +85,8 @@ const CreatePage = () => {
             "image/png": [],
             "image/webp": [],
         },
-
+        maxSize: 4 * 1024 * 1024,
+        maxFiles: 6,
         onDrop: (acceptedFiles: File[]) => {
             console.log("files", acceptedFiles);
             setPreviewImage(
@@ -126,25 +150,34 @@ const CreatePage = () => {
                                     </div>
                                 </FormControl>
                                 {previewImage.length > 0 && (
-                                    <FormDescription className="flex gap-4 h-40">
+                                    <div className="flex gap-4 ">
                                         {previewImage.map(imageUrl => (
-                                            <img
+                                            <AspectRatio
                                                 key={imageUrl}
-                                                src={imageUrl}
-                                                onLoad={() =>
-                                                    URL.revokeObjectURL(
-                                                        imageUrl,
-                                                    )
-                                                }
-                                            />
+                                                ratio={16 / 9}
+                                            >
+                                                <Image
+                                                    src={imageUrl}
+                                                    alt="image"
+                                                    layout="fill"
+                                                    objectFit="contain"
+                                                    onLoad={() =>
+                                                        URL.revokeObjectURL(
+                                                            imageUrl,
+                                                        )
+                                                    }
+                                                />
+                                            </AspectRatio>
                                         ))}
-                                    </FormDescription>
+                                    </div>
                                 )}
                                 <FormMessage />
                             </FormItem>
                         )}
                     />
-                    <Button type="submit">Submit</Button>
+                    <Button type="submit" disabled>
+                        Submit
+                    </Button>
                 </form>
             </Form>
         </div>
