@@ -15,11 +15,9 @@ import { z } from "zod";
 import { Button } from "@components/ui/button";
 import React from "react";
 import { useDropzone } from "react-dropzone";
-import { api } from "~/trpc/server";
-import { ourFileRouter } from "../api/uploadthing/core";
-import { createRouteHandler } from "uploadthing/server";
-import { POST } from "../api/uploadthing/route";
-import { NextRequest } from "next/server";
+import { generateReactHelpers } from "@uploadthing/react";
+import { uploadFiles } from "~/lib/utils/uploadthing";
+import { type NewProduct } from "~/server/api/routers/product";
 
 const formSchema = z.object({
     name: z
@@ -46,6 +44,15 @@ const CreatePage = () => {
     const onSubmit = async (value: z.infer<typeof formSchema>) => {
         console.log("submit", value);
 
+        const uploadResult = await uploadFiles("thumbnailUploader", {
+            files: value.images,
+        });
+
+        const productToUpload: NewProduct = {
+            name: value.name,
+            price: value.price,
+            image: uploadResult.map(file => file.url),
+        };
     };
 
     const { getRootProps, getInputProps } = useDropzone({

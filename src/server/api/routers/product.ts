@@ -35,10 +35,7 @@ export const productRouter = createTRPCRouter({
         .input(newProductSchema)
         .mutation(async ({ ctx, input }) => {
             return ctx.db.product.create({
-                data: {
-                    name: input.name,
-                    price: input.price,
-                },
+                data: input,
             });
         }),
 
