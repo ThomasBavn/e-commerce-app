@@ -40,11 +40,7 @@ const CreatePage = () => {
     const onSubmit = (value: z.infer<typeof formSchema>) => {
         console.log("submit", value);
 
-        const uploader = ourFileRouter.thumbnailUploader;
-
         if (value.images.length > 0) return;
-
-        uploader(value.images[0]!);
     };
 
     const { getRootProps, getInputProps } = useDropzone({
@@ -56,14 +52,15 @@ const CreatePage = () => {
         onDropAccepted: (files: File[]) => {
             form.setValue("images", files);
         },
-        onDropRejected: (err) => {
+        onDropRejected: err => {
             console.error("new error", err);
             if (!err[0]) return;
 
             switch (err?.[0].errors[0]?.code) {
                 case "file-invalid-type":
                     form.setError("images", {
-                        message: "One or more files have an invalid file format",
+                        message:
+                            "One or more files have an invalid file format",
                     });
                     break;
             }
@@ -75,7 +72,7 @@ const CreatePage = () => {
             <div className="h-60 w-40 ">
                 <Form {...form}>
                     <form
-                        onSubmit={form.handleSubmit(onSubmit, (e) =>
+                        onSubmit={form.handleSubmit(onSubmit, e =>
                             console.log("error", e),
                         )}
                     >
@@ -110,10 +107,13 @@ const CreatePage = () => {
                             name="images"
                             render={({ field }) => (
                                 <FormItem>
-                                    <FormLabel />
+                                    <FormLabel></FormLabel>
                                     <FormControl>
                                         <div {...getRootProps()}>
-                                            <input onChange={field.onChange} {...getInputProps()} />
+                                            <input
+                                                onChange={field.onChange}
+                                                {...getInputProps()}
+                                            />
                                             <div className="grid h-32 w-40 place-items-center bg-neutral-400">
                                                 Upload file
                                             </div>
