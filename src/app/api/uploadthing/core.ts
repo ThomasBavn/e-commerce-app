@@ -1,8 +1,13 @@
 import { createUploadthing, type FileRouter } from "uploadthing/next";
 import { UploadThingError } from "uploadthing/server";
+import { z } from "zod";
 import { getServerAuthSession } from "~/server/auth";
 
 const f = createUploadthing();
+
+type Output<T extends object> =
+    | { result: "error"; message: Readonly<string> }
+    | { result: "success"; data: T };
 
 // FileRouter for your app, can contain multiple FileRoutes
 export const ourFileRouter = {
@@ -41,8 +46,11 @@ export const ourFileRouter = {
             // Whatever is returned here is accessible in onUploadComplete as `metadata`
             return { userId: session.user.id };
         })
+        .onUploadError(err => {
+            return { result: "error", message: err.error.message };
+        })
         .onUploadComplete(async ({ metadata, file }) => {
-            return { url: file.url };
+            return { result: "success", data: { url: file.url } };
         }),
 } satisfies FileRouter;
 
