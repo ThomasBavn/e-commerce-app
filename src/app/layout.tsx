@@ -21,7 +21,9 @@ export default function RootLayout({
       <body>
         <div className="grid h-screen grid-rows-[auto,1fr]">
           <TopNav />
-          <TRPCReactProvider>{children}</TRPCReactProvider>
+          <TRPCReactProvider>
+            <div className="container">{children}</div>
+          </TRPCReactProvider>
         </div>
       </body>
     </html>
