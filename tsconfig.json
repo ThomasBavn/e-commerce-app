@@ -13,7 +13,11 @@
     "noUncheckedIndexedAccess": true,
     "checkJs": true,
     /* Bundled projects */
-    "lib": ["dom", "dom.iterable", "ES2022"],
+    "lib": [
+      "dom",
+      "dom.iterable",
+      "ES2022"
+    ],
     "noEmit": true,
     "module": "ESNext",
     "moduleResolution": "Bundler",
@@ -27,8 +31,12 @@
     /* Path Aliases */
     "baseUrl": ".",
     "paths": {
-      "@components/*": ["./src/app/_components/*"],
-      "~/*": ["./src/*"]
+      "@components/*": [
+        "./src/app/_components/*"
+      ],
+      "~/*": [
+        "./src/*"
+      ]
     }
   },
   "include": [
@@ -40,5 +48,7 @@
     "**/*.js",
     ".next/types/**/*.ts"
   ],
-  "exclude": ["node_modules"]
+  "exclude": [
+    "node_modules"
+  ]
 }
