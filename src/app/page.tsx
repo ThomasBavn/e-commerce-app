@@ -39,8 +39,6 @@ async function CrudShowcase() {
 
   const latestPost = await api.post.getLatest();
 
-  const x = await api.product.getById(1);
-
   return (
     <div className="w-full max-w-xs">
       {latestPost ? (
