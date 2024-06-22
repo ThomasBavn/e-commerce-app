@@ -1,3 +1,4 @@
+import { type Product } from "@prisma/client";
 import { z } from "zod";
 
 import {
@@ -5,6 +6,17 @@ import {
     protectedProcedure,
     publicProcedure,
 } from "~/server/api/trpc";
+
+export type NewProduct = z.infer<typeof newProductSchema>;
+
+const newProductSchema: z.ZodType<Omit<Product, "id">> = z.object({
+    name: z.string().min(1).max(255),
+    price: z
+        .number()
+        .nonnegative("price cannot be negative")
+        .safe("too large number entered"),
+    imageUrls: z.array(z.string().url()),
+});
 
 export const productRouter = createTRPCRouter({
     getById: publicProcedure.input(z.number()).query(async ({ ctx, input }) => {
@@ -20,22 +32,12 @@ export const productRouter = createTRPCRouter({
     }),
 
     create: protectedProcedure
-        .input(
-            z.object({
-                newProduct: z.object({
-                    name: z.string().min(1).max(255),
-                    price: z
-                        .number()
-                        .nonnegative("price cannot be negative")
-                        .safe("too large number entered"),
-                }),
-            }),
-        )
+        .input(newProductSchema)
         .mutation(async ({ ctx, input }) => {
             return ctx.db.product.create({
                 data: {
-                    name: input.newProduct.name,
-                    price: input.newProduct.price,
+                    name: input.name,
+                    price: input.price,
                 },
             });
         }),
