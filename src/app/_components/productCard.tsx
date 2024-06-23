@@ -1,19 +1,16 @@
-import { MOCK_IMAGE_URLS } from "../mockData";
 import Image from "next/image";
 import { P } from "./ui/typography";
 import { type Product } from "@prisma/client";
-
-const image = MOCK_IMAGE_URLS[0];
 
 interface Props {
     product: Product;
 }
 
-const ProdcutCard = ({ product }: Props) => {
+const ProductCard = ({ product }: Props) => {
     console.log("product", product);
     return (
-        <div className="flex flex-col gap-1">
-            <div className="relative h-60 w-44">
+        <div className="flex flex-col gap-1 max-w-40">
+            <div className="relative h-60 w-40">
                 <Image
                     src={product.imageUrls[0] ?? ""}
                     alt="product"
@@ -28,4 +25,4 @@ const ProdcutCard = ({ product }: Props) => {
     );
 };
 
-export default ProdcutCard;
+export default ProductCard;

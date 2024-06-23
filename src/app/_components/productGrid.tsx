@@ -13,6 +13,8 @@ export function ProductGrid() {
     );
 
     return (
-        <>{products.data?.map(p => <ProductCard key={p.id} product={p} />)}</>
+        <div className="flex flex-wrap gap-4">
+            {products.data?.map(p => <ProductCard key={p.id} product={p} />)}
+        </div>
     );
 }
