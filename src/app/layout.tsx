@@ -19,7 +19,7 @@ export default function RootLayout({
     return (
         <html lang="en" className={`${GeistSans.variable}`}>
             <body>
-                <div className="grid h-screen grid-rows-[auto,1fr]">
+                <div className="grid h-screen gap-8 grid-rows-[auto,1fr]">
                     <TopNav />
                     <TRPCReactProvider>
                         <main className="container">{children}</main>
