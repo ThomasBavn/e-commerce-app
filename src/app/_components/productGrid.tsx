@@ -1,19 +1,18 @@
-import { api } from "~/trpc/server";
-import React, { type ReactNode } from "react";
+"use client";
 
-export async function ProductGrid() {
-    const products = await api.product.getAll();
+import React from "react";
+import ProductCard from "./productCard";
+import { api } from "~/trpc/react";
+
+export function ProductGrid() {
+    const products = api.product.getAll.useQuery();
 
     console.log(
         "products",
-        products.map(p => p.name),
+        products.data?.map(p => p.name),
     );
 
     return (
-        <>
-            {products.map(p => (
-                <p key={p.id}>{p.name}</p>
-            ))}
-        </>
+        <>{products.data?.map(p => <ProductCard key={p.id} product={p} />)}</>
     );
 }
