@@ -28,21 +28,41 @@ export const productRouter = createTRPCRouter({
     }),
 
     getAll: publicProcedure.query(async ({ ctx }) => {
-        return ctx.db.product.findMany();
+        try {
+            const products = await ctx.db.product.findMany();
+
+            console.log("PRODUCTS", products);
+            return products;
+        } catch (e) {
+            console.error("ERROR", e);
+
+            return [];
+        }
     }),
 
     create: protectedProcedure
         .input(newProductSchema)
         .mutation(async ({ ctx, input }) => {
-            return ctx.db.product.create({
-                data: input,
-            });
+            console.log("creating new product", input);
+            try {
+                const createResponse = await ctx.db.product.create({
+                    data: {
+                        name: input.name,
+                        price: input.price,
+                        imageUrls: input.imageUrls,
+                    },
+                });
+
+                return { result: "success", data: { id: createResponse.id } };
+            } catch (e) {
+                return { result: "error", message: e };
+            }
         }),
 
     delete: protectedProcedure
         .input(z.object({ id: z.number() }))
         .mutation(async ({ ctx, input }) => {
-            return ctx.db.product.delete({
+            return await ctx.db.product.delete({
                 where: {
                     id: input.id,
                 },

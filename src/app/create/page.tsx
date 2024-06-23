@@ -18,15 +18,16 @@ import React from "react";
 import { useDropzone } from "react-dropzone";
 import { uploadFiles } from "~/lib/utils/uploadthing";
 import { type NewProduct } from "~/server/api/routers/product";
-import { api } from "~/trpc/server";
 import { UploadThingError } from "uploadthing/server";
 import { PrismaClientValidationError } from "@prisma/client/runtime/library";
 import { AspectRatio } from "@components/ui/aspect-ratio";
+import { api } from "~/trpc/react";
 
 const formSchema = z.object({
-    name: z.string(),
-    // .min(1, { message: "Product name too short" })
-    // .max(255, { message: "Product name too short" }),
+    name: z
+        .string()
+        .min(1, { message: "Product name too short" })
+        .max(255, { message: "Product name too short" }),
     price: z.coerce
         .number({ invalid_type_error: "Price must be a number" })
         .min(0)
@@ -46,6 +47,12 @@ const CreatePage = () => {
 
     const [previewImage, setPreviewImage] = React.useState<string[]>([]);
 
+    const createProduct = api.product.create.useMutation({
+        onSuccess: response => {
+            console.log("product succesfully created", response);
+        },
+    });
+
     const onSubmit = async (value: z.infer<typeof formSchema>) => {
         console.log("submit", value);
 
@@ -61,8 +68,10 @@ const CreatePage = () => {
                 imageUrls: fileUploadResult.map(file => file.url),
             };
 
+            console.log("creating product", productToUpload);
+
             const productCreateResult =
-                await api.product.create(productToUpload);
+                await createProduct.mutateAsync(productToUpload);
 
             console.log("everything was succesful", productCreateResult);
         } catch (e) {
@@ -175,9 +184,7 @@ const CreatePage = () => {
                             </FormItem>
                         )}
                     />
-                    <Button type="submit" disabled>
-                        Submit
-                    </Button>
+                    <Button type="submit">Submit</Button>
                 </form>
             </Form>
         </div>
