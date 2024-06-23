@@ -6,6 +6,12 @@
 -   [x] CRUD operations for Product
 -   [x] Connect to uploadthing
 -   [x] Create 'create product' page
+-   [ ] Add authentication to file upload using roles
+-   [ ] Add google login support
+-   [ ] Get and display products
+-   [x] Design card
+-   [ ] Add item to shopping cart
+-   [ ] Shopping cart for user
 
 ## Ideas
 
