@@ -12,14 +12,15 @@ export function ProductGrid() {
         products.data?.map(p => p.name),
     );
 
+    const skeletons = Array.from({ length: 8 }).map((_, i) => (
+        <ProductCard key={i} />
+    ));
+
     return (
         <div className="flex flex-wrap gap-4">
-            <ProductCard />
-            {products.data ? (
-                products.data.map(p => <ProductCard key={p.id} product={p} />)
-            ) : (
-                <ProductCard />
-            )}
+            {products.data
+                ? products.data.map(p => <ProductCard key={p.id} product={p} />)
+                : skeletons}
         </div>
     );
 }
