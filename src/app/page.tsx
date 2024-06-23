@@ -6,36 +6,39 @@ import { api } from "~/trpc/server";
 import { H3, P } from "./_components/ui/typography";
 import { Button } from "./_components/ui/button";
 import ProductCard from "@components/productCard";
+import { ProductGrid } from "@components/productGrid";
 
-export default async function Home() {
-    const hello = await api.post.hello({ text: "from tRPC" });
-    const session = await getServerAuthSession();
-
+export default function Home() {
     return (
         <main className="flex min-h-screen flex-col items-center justify-center">
+            <ProductGrid />
             <ProductCard />
 
-            <div className="flex flex-col items-center gap-2">
-                <H3>{hello ? hello.greeting : "Loading tRPC query..."}</H3>
-
-                <div className="flex flex-col items-center justify-center gap-4">
-                    {session && <P>Logged in as {session.user?.name}</P>}
-                    <Button asChild>
-                        <Link
-                            href={
-                                session
-                                    ? "/api/auth/signout"
-                                    : "/api/auth/signin"
-                            }
-                        >
-                            {session ? "Sign out" : "Sign in"}
-                        </Link>
-                    </Button>
-                </div>
-            </div>
-
-            <CrudShowcase />
+            <Showcase />
         </main>
+    );
+}
+
+async function Showcase() {
+    const hello = await api.post.hello({ text: "from tRPC" });
+    const session = await getServerAuthSession();
+    return (
+        <div className="flex flex-col items-center gap-2">
+            <H3>{hello ? hello.greeting : "Loading tRPC query..."}</H3>
+
+            <div className="flex flex-col items-center justify-center gap-4">
+                {session && <P>Logged in as {session.user?.name}</P>}
+                <Button asChild>
+                    <Link
+                        href={
+                            session ? "/api/auth/signout" : "/api/auth/signin"
+                        }
+                    >
+                        {session ? "Sign out" : "Sign in"}
+                    </Link>
+                </Button>
+            </div>
+        </div>
     );
 }
 
